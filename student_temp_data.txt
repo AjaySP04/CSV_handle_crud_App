@@ -1,0 +1,28 @@
+{
+  "students" : [
+   {
+    "roll_number" : "S00001",
+	"name" : "Test Student1",
+	"age" : 22,
+	"gender" : "Male"
+   },
+   {
+    "roll_number" : "S00002",
+	"name" : "Test Student2",
+	"age" : 24,
+	"gender" : "Female"
+   },
+   {
+    "roll_number" : "S00003",
+	"name" : "Test Student3",
+	"age" : 22,
+	"gender" : "Male"
+   },
+   {
+    "roll_number" : "S00004",
+	"name" : "Test Student4",
+	"age" : 19,
+	"gender" : "Female"
+   }
+  ]
+}
