@@ -2,6 +2,7 @@
 import os
 import sys
 
+import re
 import json
 
 student_string = '''
@@ -78,15 +79,24 @@ def write_json_to_file(data, file):
 		json.dump(data, f, indent=2, sort_keys=True)
 	f.close()
 	
+#: count number of student in the database
+#: Will be used in generating roll number
+def get_last_roll_number(data):
+	counter = 0
+	last_student = data['students'][-1]
+	return last_student['roll_number'][-4:]
 	
 def add_student(file, target_file):
 	#: read the data
 	data = read_file_as_json(file)
-		
+	
+	#count number of student in the data	
+	last_roll_number = int(get_last_roll_number(data))
+	
 	#: create a student data as dictionary
-	name = 'New Student'
-	roll_number = 'S00005'
-	age = 19
+	name = 'John Doe'
+	roll_number = 'S0000' + str(last_roll_number + 1) #: roll number will be the increment of total number of student.
+	age = 30
 	gender = 'Male'
 	
 	dict_student_obj = {
@@ -170,23 +180,35 @@ def delete_student_from_data(file, target_file, _id=''):
 	write_json_to_file(data, target_file)
 
 def search_student_from_data(file, target_search_string=''):
-	
+	#: list of matched student. 
+	#: initialized to empty list
 	list_of_matched_student = []
 	
 	if target_search_string == '':
 		print('Nothing specified for search...')
 	else:
+		#: pattern to search
+		pattern = target_search_string
+		
 		# get all students in the database.
 		list_of_students = list_all_students(file)
 		
 		#: loop on the string to find the student.
 		for student in list_of_students:
 			
-			if student['roll_number'] == target_search_string:
-				list_of_matched_student.append(student)
-			
-			if student['name'] == target_search_string:
-				list_of_matched_student.append(student)
+			#: if student['roll_number'] == target_search_string:
+			#: list_of_matched_student.append(student)
+			#: If roll number pattern is enter search through roll numbers.
+			if re.search(r'^S0', pattern):
+				if re.search(pattern, student['roll_number'], re.IGNORECASE):
+					list_of_matched_student.append(student)
+			else:
+				#: if roll number pattern doesn't satisfy then search in name.
+				if re.search(pattern, student['name'], re.IGNORECASE):
+					list_of_matched_student.append(student)
+				
+			#if student['name'] == target_search_string:
+			#	list_of_matched_student.append(student)
 				
 	return list_of_matched_student
 	
@@ -201,13 +223,21 @@ def list_all_students(file):
 	return list_of_all_students
 	
 def display_student_list(list):
-	for item in list:
+	
+	if list == [] :
+		#: if nothing found in list.
 		print('''
-			Name : {}
-			Roll Number : {}
-			Age : {}
-			Gender : {}
-		'''.format(item['name'], item['roll_number'], item['age'], item['gender']), end='\n') 
+			Sorry :( No record match found...
+			''')
+	else:
+		#: for item in list display all information.
+		for item in list:
+			print('''
+				Name : {}
+				Roll Number : {}
+				Age : {}
+				Gender : {}
+			'''.format(item['name'], item['roll_number'], item['age'], item['gender']), end='\n') 
 	
 def main():
 	#training()
@@ -219,15 +249,15 @@ def main():
 	#: list all the student data.
 	#list = list_all_students(target_file)
 	
-	target_search_string = input('Enter Student to search : ')
-	list = search_student_from_data(target_file, target_search_string)
+	#target_search_string = input('Enter Student to search : ')
+	#list = search_student_from_data(target_file, target_search_string)
 	
-	# Display all fetched data.
-	display_student_list(list)
+	#: Display all fetched data.
+	#display_student_list(list)
 	
-	#add_student(file, target_file)
-	#update_student_detail(target_file, target_file)
-	#delete_student_from_data(target_file, target_file)
+	add_student(target_file, target_file)
+	#: update_student_detail(target_file, target_file)
+	#: delete_student_from_data(target_file, target_file)
 	
 	pass
 
